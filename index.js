@@ -14,6 +14,13 @@ const fs = require('fs/promises');
 async function readMembers(filePath) {
   // TODO: 實作此函式
   // 提示：用 fs/promises 的 readFile，記得加 'utf-8'，再用 JSON.parse 轉成物件
+  try {
+    const result = await fs.readFile(filePath, { encoding: 'utf-8' }) 
+
+    return JSON.parse(result)
+  } catch (error) {
+    return error
+  }
 }
 
 // ========== 任務二：篩選 VIP 會員 ==========
@@ -32,6 +39,13 @@ async function readMembers(filePath) {
 function filterVIP(members) {
   // TODO: 實作此函式
   // 提示：用 Array.prototype.filter，不要修改原陣列
+  try {
+    const result = members.filter(member => member.level === 'VIP')
+
+    return result
+  } catch (error) {
+    return error
+  }
 }
 
 // ========== 任務三：計算會員剩餘點數總和 ==========
@@ -48,6 +62,23 @@ function filterVIP(members) {
 function sumCredits(members) {
   // TODO: 實作此函式
   // 提示：用 reduce，初始值給 0
+
+    try {
+    const result = members.reduce((accu, current) => {
+      console.log('accu before', accu)
+      console.log('current', current)
+      accu += current.credits
+
+      console.log('accu after', accu)
+      return accu
+    }, 0)
+
+    console.log(result)
+
+    return result
+  } catch (error) {
+    return error
+  }
 }
 
 // ========== 任務四：讀取環境變數 ==========
@@ -70,6 +101,24 @@ function sumCredits(members) {
 function getGymConfig() {
   // TODO: 實作此函式
   // 提示：用 || 給預設值
+  try {
+    const gymName = process.env.GYM_NAME || '未命名健身房'
+    const adminName = process.env.ADMIN_NAME || '尚未指派'
+    const defaultMembersPath = process.env.DEFAULT_MEMBERS_PATH || undefined
+
+    return {
+      gymName,
+      adminName,
+      defaultMembersPath
+    }
+  } catch (error) {
+    console.log('getGymConfig error', error)
+    return {
+      gymName: '未命名健身房',
+      adminName: '尚未指派',
+      defaultMembersPath: undefined
+    }
+  }
 }
 
 // ========== 任務五：VIP 會員統計摘要（綜合題）==========
@@ -92,6 +141,23 @@ async function getVIPSummary(filePath) {
   //   2. 篩出 VIP
   //   3. 算總點數、收集姓名
   //   4. 回傳 { count, totalCredits, names }
+  try {
+    const members = await readMembers(filePath)
+
+    const vips = filterVIP(members)
+
+    const credits = sumCredits(vips)
+
+    const data = {
+      count: vips.length,
+      totalCredits: credits,
+      names: vips.map(vip => vip.name)
+    }
+
+    return data
+  } catch (error) {
+    return error
+  }  
 }
 
 module.exports = {
